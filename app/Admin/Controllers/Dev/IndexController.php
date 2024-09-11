@@ -57,6 +57,9 @@ class IndexController extends AdminController
             ]);
             $tools->append($search);
         });
+        $grid->batchActions(function ($batch) {
+            $batch->add(new \App\Admin\Actions\Dev\DownloadJson());
+        });
         return $grid;
     }
 
