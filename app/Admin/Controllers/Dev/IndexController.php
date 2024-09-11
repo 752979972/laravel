@@ -28,10 +28,10 @@ class IndexController extends AdminController
         $result = Dev::getSearchResult();
         if (isset($result['status']) && !$result['status'] && isset($result['message'])) {
             //正式环境 可以 view()模版输出 错误， 或者 直接返回错误 return response()->json(['message' => 'Failed to create user.', 'error' => 'sss'], 500);
-            $grid->header(function () use ($result){
-                return '<div id="error-message" style="color: red;">'.$result['message'].'</div>';
+            $grid->header(function () use ($result) {
+                return '<div id="error-message" style="color: red;">' . $result['message'] . '</div>';
             });
-        }else{
+        } else {
 
         }
         $grid->quickSearch('user', 'sql')->placeholder('select * from devs where user="1" ');

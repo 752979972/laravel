@@ -28,7 +28,7 @@ class Dev extends Model
     public static function getSearchResult()
     {
         $searchSql = request()->input('__search__');
-        $result = ['status'=> true,'message'=>''];
+        $result = ['status' => true, 'message' => ''];
         if ($searchSql) try {
             //处理特殊字符 或者使用 系统自带的 Validator::mak 来验证都可以
             $sql = str_replace(["'", "\\"], ['"', ''], strip_tags($searchSql));
