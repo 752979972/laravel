@@ -28,29 +28,49 @@ class Dev extends Model
     public static function getSearchResult()
     {
         $searchSql = request()->input('search');
-        $result = ['status' => true, 'message' => ''];
+        $result = ['status' => false, 'message' => ''];
         if ($searchSql) {
             try {
                 //处理特殊字符 或者使用 系统自带的 Validator::mak 来验证都可以
                 $sql = str_replace(["'", "\\"], ['"', ''], strip_tags($searchSql));
-                $selectDb = DB::select($sql);
-                $data = [];
-                foreach ($selectDb as $item) {
-                    $data[] = $item->id;
+                //只允许查询结果，否则提示错误
+                if (str_contains($sql, 'select') && !str_contains($sql, 'update') && !str_contains($sql, 'insert')) {
+                    $selectDb = DB::select($sql);
+                    $data = [];
+                    foreach ($selectDb as $item) {
+                        $data[] = $item->id;
+                    }
+                    $result['status'] = true;
+                    //因为需求没有明确说查某一个表，所以demo目前只提供查devs此表
+                    $result['ids'] = $data;
+                } else {
+                    $result['message'] = __('SQL Query Error, Only Select Is Allowed');
                 }
-                //因为需求没有明确说查某一个表，所以demo目前只提供查devs此表
-                $result['ids'] = $data;
             } catch (\Exception $e) {
-                $result['status'] = false;
+                //异常信息输出提示
                 $result['message'] = $e->getMessage();
             }
+
+            self::addSearchLog(['sql' => $result, 'message' => $result['message']]);
         }
         return $result;
     }
 
-    public function addSearchLog()
+    /**
+     * 添加 记录查询
+     * @param $search
+     * @return void
+     */
+    private static function addSearchLog($search)
     {
         $userName = Admin::user()->name;
-        $searchSql = request()->input('__search__');
+        $searchSql = request()->input('search');
+        $data = [
+            'user' => $userName,
+            'sql' => $searchSql,//$search['sql'],
+            'error' => $search['message'],
+            'created_at' => date('Y-m-d H:i:s'),
+        ];
+        \App\Models\Dev::insert($data);
     }
 }
