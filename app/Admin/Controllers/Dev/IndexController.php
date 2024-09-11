@@ -44,7 +44,7 @@ class IndexController extends AdminController
         $grid->column('error', __('error'))->display(function ($desc) {
             return strlen($desc) > 60 ? mb_substr($desc, 0, 60, "UTF-8") . '...' : $desc;
         })->expand(function ($model) {
-            return nl2br($model->description);
+            return nl2br($model->error);
         });
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'))->hide();
