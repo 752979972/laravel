@@ -31,10 +31,11 @@ class IndexController extends AdminController
             $grid->header(function () use ($result) {
                 return '<div id="error-message" style="color: red;">' . $result['message'] . '</div>';
             });
-        } else {
-
+        } elseif (isset($result['ids'])) {
+            //因为需求没有明确说查某一个表，所以demo目前只提供查devs此表
+            $grid->model()->where('id', $result['ids']);
         }
-        $grid->quickSearch('user', 'sql')->placeholder('select * from devs where user="1" ');
+        //$grid->quickSearch()->placeholder('select * from devs where user="1" ');
         $grid->setActionClass(\Encore\Admin\Grid\Displayers\Actions::class);
 
         $grid->column('id', __('Id'));
@@ -48,7 +49,14 @@ class IndexController extends AdminController
         $grid->column('created_at', __('Created at'));
         $grid->column('updated_at', __('Updated at'))->hide();
         $grid->model()->orderBy('id', 'desc');
-
+        $grid->tools(function ($tools) {
+            $url = url('admin/dev');
+            $search = view('/admin/devs/search', [
+                'url' => $url,
+                'token' => csrf_token()
+            ]);
+            $tools->append($search);
+        });
         return $grid;
     }
 

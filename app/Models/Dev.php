@@ -27,16 +27,23 @@ class Dev extends Model
      */
     public static function getSearchResult()
     {
-        $searchSql = request()->input('__search__');
+        $searchSql = request()->input('search');
         $result = ['status' => true, 'message' => ''];
-        if ($searchSql) try {
-            //处理特殊字符 或者使用 系统自带的 Validator::mak 来验证都可以
-            $sql = str_replace(["'", "\\"], ['"', ''], strip_tags($searchSql));
-            //$result = DB::select($sql);
-
-        } catch (\Exception $e) {
-            $result['status'] = false;
-            $result['message'] = $e->getMessage();
+        if ($searchSql) {
+            try {
+                //处理特殊字符 或者使用 系统自带的 Validator::mak 来验证都可以
+                $sql = str_replace(["'", "\\"], ['"', ''], strip_tags($searchSql));
+                $selectDb = DB::select($sql);
+                $data = [];
+                foreach ($selectDb as $item) {
+                    $data[] = $item->id;
+                }
+                //因为需求没有明确说查某一个表，所以demo目前只提供查devs此表
+                $result['ids'] = $data;
+            } catch (\Exception $e) {
+                $result['status'] = false;
+                $result['message'] = $e->getMessage();
+            }
         }
         return $result;
     }
