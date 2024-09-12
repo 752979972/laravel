@@ -26,7 +26,7 @@ class IndexController extends AdminController
     {
         $grid = new Grid(new Dev());
         $result = Dev::getSearchResult();
-        if (isset($result['status']) && !$result['status'] && isset($result['message'])) {
+        if (isset($result['status']) && $result['status']==true) {
             //正式环境 可以 view()模版输出 错误， 或者 直接返回错误 return response()->json(['message' => 'Failed to create user.', 'error' => 'sss'], 500);
             $grid->header(function () use ($result) {
                 return '<div id="error-message" style="color: red;">' . $result['message'] . '</div>';
